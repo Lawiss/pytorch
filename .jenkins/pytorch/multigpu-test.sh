@@ -10,6 +10,11 @@ COMPACT_JOB_NAME="${BUILD_ENVIRONMENT}"
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 
 echo "Testing pytorch (distributed only)"
+sudo mkdir /var/lib/jenkins/workspace/test/test-reports
+sudo chown jenkins test/test-reports
+
+# TODO move this to docker
+pip_install unittest-xml-reporting
 
 if [ -n "${IN_CIRCLECI}" ]; then
   if [[ "$BUILD_ENVIRONMENT" == *-xenial-cuda9-* ]]; then
