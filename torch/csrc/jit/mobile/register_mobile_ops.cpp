@@ -19,7 +19,7 @@ at::Tensor optional_to_tensor(c10::optional<at::Tensor> v) {
   return v.has_value() ? *v : at::Tensor();
 }
 
-void adaptive_avg_pool2d_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void adaptive_avg_pool2d_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -31,7 +31,7 @@ void adaptive_avg_pool2d_kernel(OperatorKernel*, const c10::OperatorHandle& op, 
   pack(*stack, std::move(result_));
 }
 
-void _convolution_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void _convolution_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -53,7 +53,7 @@ void _convolution_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* 
   pack(*stack, std::move(result_));
 }
 
-void conv2d_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void conv2d_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
     at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -70,7 +70,7 @@ void conv2d_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack)
     pack(*stack, std::move(result_));
 }
 
-void max_pool2d_with_indices_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void max_pool2d_with_indices_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
     at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -86,7 +86,7 @@ void max_pool2d_with_indices_kernel(OperatorKernel*, const c10::OperatorHandle& 
     pack(*stack, std::move(result_));
 }
 
-void max_pool2d_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void max_pool2d_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -102,7 +102,7 @@ void max_pool2d_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* st
   pack(*stack, std::move(result_));
 }
 
-void t_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void t_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -113,7 +113,7 @@ void t_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
   pack(*stack, std::move(result_));
 }
 
-void relu_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void relu_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
   #endif
@@ -124,7 +124,7 @@ auto result_ = at::relu(
   pack(*stack, std::move(result_));
 }
 
-void addmm_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void addmm_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -140,7 +140,7 @@ void addmm_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) 
   pack(*stack, std::move(result_));
 }
 
-void view_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void view_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -151,7 +151,7 @@ void view_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
   pack(*stack, std::move(result_));
 }
 
-void flatten_kernel(OperatorKernel*, const c10::OperatorHandle& op, Stack* stack) {
+void flatten_kernel(const c10::OperatorHandle& op, Stack* stack) {
 #ifdef USE_STATIC_DISPATCH
   at::AutoNonVariableTypeMode non_var_type_mode(true);
 #endif
@@ -184,7 +184,7 @@ static auto registry = torch::RegisterOperators().op(
                                            })
 ).op(
   "_aten::adaptive_avg_pool2d(Tensor self, int[2] output_size) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &adaptive_avg_pool2d_kernel)
+  torch::RegisterOperators::options().kernel<&adaptive_avg_pool2d_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::mm",
   torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId,
@@ -193,10 +193,10 @@ static auto registry = torch::RegisterOperators().op(
   })
 ).op(
   "_aten::_convolution(Tensor input, Tensor weight, Tensor? bias, int[] stride, int[] padding, int[] dilation, bool transposed, int[] output_padding, int groups, bool benchmark, bool deterministic, bool cudnn_enabled) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &_convolution_kernel)
+  torch::RegisterOperators::options().kernel<&_convolution_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::conv2d(Tensor input, Tensor weight, Tensor? bias=None, int[2] stride=1, int[2] padding=0, int[2] dilation=1, int groups=1) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &conv2d_kernel)
+  torch::RegisterOperators::options().kernel<&conv2d_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::batch_norm",
   torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId,
@@ -209,10 +209,10 @@ static auto registry = torch::RegisterOperators().op(
   })
 ).op(
   "_aten::max_pool2d_with_indices(Tensor self, int[2] kernel_size, int[2] stride=[], int[2] padding=0, int[2] dilation=1, bool ceil_mode=False) -> (Tensor, Tensor)",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &max_pool2d_with_indices_kernel)
+  torch::RegisterOperators::options().kernel<&max_pool2d_with_indices_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::max_pool2d(Tensor self, int[2] kernel_size, int[2] stride=[], int[2] padding=0, int[2] dilation=1, bool ceil_mode=False) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &max_pool2d_kernel)
+  torch::RegisterOperators::options().kernel<&max_pool2d_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::threshold",
   torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId,
@@ -221,7 +221,7 @@ static auto registry = torch::RegisterOperators().op(
   })
 ).op(
   "_aten::relu(Tensor self) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &relu_kernel)
+  torch::RegisterOperators::options().kernel<&relu_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::relu_",
   torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId,
@@ -231,7 +231,7 @@ static auto registry = torch::RegisterOperators().op(
 ).op(
   "_aten::t(Tensor(a) self) -> Tensor(a)",
   torch::RegisterOperators::options()
-    .kernel(c10::TensorTypeId::CPUTensorId, &t_kernel)
+    .kernel<&t_kernel>(c10::TensorTypeId::CPUTensorId)
     .aliasAnalysis(c10::AliasAnalysisKind::FROM_SCHEMA)
 ).op(
   "_aten::size.int",
@@ -241,11 +241,11 @@ static auto registry = torch::RegisterOperators().op(
   })
 ).op(
   "_aten::addmm(Tensor self, Tensor mat1, Tensor mat2, *, Scalar beta=1, Scalar alpha=1) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &addmm_kernel)
+  torch::RegisterOperators::options().kernel<&addmm_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::view(Tensor(a) self, int[] size) -> Tensor(a)",
   torch::RegisterOperators::options()
-    .kernel(c10::TensorTypeId::CPUTensorId, &view_kernel)
+    .kernel<&view_kernel>(c10::TensorTypeId::CPUTensorId)
     .aliasAnalysis(c10::AliasAnalysisKind::FROM_SCHEMA)
 ).op(
   "_aten::dim",
@@ -271,7 +271,7 @@ static auto registry = torch::RegisterOperators().op(
   })
 ).op(
   "_aten::flatten.using_ints(Tensor self, int start_dim=0, int end_dim=-1) -> Tensor",
-  torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId, &flatten_kernel)
+  torch::RegisterOperators::options().kernel<&flatten_kernel>(c10::TensorTypeId::CPUTensorId)
 ).op(
   "_aten::Int",
   torch::RegisterOperators::options().kernel(c10::TensorTypeId::CPUTensorId,
